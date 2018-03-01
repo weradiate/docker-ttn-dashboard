@@ -10,6 +10,18 @@ cron || exit 1
 # test that we have a proper setup.
 cd $HOME || exit 2
 
+#htpasswd  
+chown www-data /etc/apache2/authdata /etc/apache2/authdata/.htpasswd /etc/apache2/authdata/.htgroup
+chmod 700 /etc/apache2/authdata
+chmod 600 /etc/apache2/authdata/.htpasswd /etc/apache2/authdata/.htgroup
+
+touch /etc/apache2/authdata/.htpasswd   
+htpasswd -b -c /etc/apache2/authdata/.htpasswd admin 
+touch /etc/apache2/authdata/.htgroup
+echo "node-red: admin" >> /etc/apache2/authdata/.htgroup  
+echo "admin: admin" >> /etc/apache2/authdata/.htgroup  
+echo "query: admin" >> /etc/apache2/authdata/.htgroup
+
 # test that authentication is set up, and set permissions as needed by us
 if [ ! -d /etc/apache2/authdata ] ; then
 	echo "The authdata directory is not set; refer to docker-compose script"
@@ -23,9 +35,6 @@ if [ ! -f /etc/apache2/authdata/.htgroup ]; then
 	echo ".htgroup file not found"
 	exit 3
 fi
-chown www-data /etc/apache2/authdata /etc/apache2/authdata/.htpasswd /etc/apache2/authdata/.htgroup
-chmod 700 /etc/apache2/authdata
-chmod 600 /etc/apache2/authdata/.htpasswd /etc/apache2/authdata/.htgroup
 
 # check that we got the vars we need
 if [ -z "$CERTBOT_DOMAINS" -o "$CERTBOT_DOMAINS" = "." ]; then
