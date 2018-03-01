@@ -3,7 +3,8 @@
 #
 
 # gack. start from ubuntu.
-FROM ubuntu:latest
+FROM phusion/baseimage:0.10.0
+
 
 RUN /usr/bin/apt-get update && /usr/bin/apt-get install software-properties-common -y
 RUN /usr/bin/add-apt-repository ppa:certbot/certbot && /usr/bin/apt-get update && /usr/bin/apt-get install apache2 -y
@@ -27,5 +28,7 @@ COPY setup.sh proxy-*.conf /root/
 # we need to run cron (for letsencrypt update) and apache. Try doing it
 # by launching with bash... supervisord is sort of heavy for our purposes.
 # 
-CMD [ "/bin/bash", "/root/setup.sh" ]
+CMD ["/sbin/my_init"]
+# Clean up APT when done.
+RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 # end of file
